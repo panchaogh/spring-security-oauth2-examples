@@ -14,6 +14,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
     </properties>
 
     <repositories>
@@ -31,15 +33,44 @@
             </snapshots>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public</id>
+            <name>aliyun nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
     <modules>
         <module>custom-security-demo</module>
         <module>spring-security-demo</module>
+        <module>spring-security-oauth2-demo</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
-
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -56,6 +87,12 @@
             <scope>provided</scope>
             <version>1.18.16</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -63,6 +100,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -71,6 +109,7 @@
 
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
                     <encoding>utf-8</encoding>
                     <useDefaultDelimiters>true</useDefaultDelimiters>

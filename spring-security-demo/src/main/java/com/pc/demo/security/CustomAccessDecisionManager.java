@@ -12,6 +12,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 自定义决策管理器
+ */
 public class CustomAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {

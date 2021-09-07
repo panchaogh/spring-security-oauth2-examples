@@ -1,0 +1,30 @@
+server:
+  port: ${EUREKA_PORT:8761} #服务端口号
+  tomcat:
+    uri-encoding: UTF-8
+    accept-count: 100 # 等待队列长度，默认100
+    max-connections: 8192
+    max-threads: 200 # 最大工作线程数，默认200, 4核8g内存，线程数经验值800
+    min-spare-threads: 10 # 最小工作空闲线程数，默认10, 适当增大一些，以便应对突然增长的访问量
+
+spring:
+  application:
+    name: eureka #应用名称
+    
+eureka:
+  instance:
+    hostname: ${EUREKA_ZONE_HOST:localhost} #实例主机名称
+  server:
+    enable-self-preservation: false #关闭自我保护
+    eviction-interval-timer-in-ms: 5000 #清理间隔（单位毫秒，默认是60*1000）
+  client:
+    registerWithEureka: false #注册中心集群时需要改为true
+    fetchRegistry: false #注册中心集群时需要改为true
+    serviceUrl:
+      defaultZone: http://${EUREKA_ZONE_HOST:localhost}:${EUREKA_ZONE_PORT:8761}/eureka/ #注册地址，注册中心单台服务时填写自身地址；集群时需要填写其他集群服务地址(多台时使用,隔开)
+
+logging:
+  pattern:
+    console: "%d{yyyy/MM/dd-HH:mm:ss} [%thread] %-5level %logger- %msg%n"
+  level:
+    root: info
