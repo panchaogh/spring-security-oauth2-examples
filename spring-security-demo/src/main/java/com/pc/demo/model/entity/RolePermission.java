@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author PC
@@ -19,17 +19,17 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("t_user_role")
-public class UserRole implements Serializable {
+@TableName("t_role_permission")
+public class RolePermission implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
-    private Long userId;
+    private Long id;
 
     private Long roleId;
+
+    private Long permissionId;
 
 
 }

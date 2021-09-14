@@ -25,12 +25,18 @@ import java.util.List;
 public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = request.getHeader("Authentication");
+        String token = request.getHeader("Authorization");
         if (StringUtils.isBlank(token)) {
             filterChain.doFilter(request, response);
             return;
         }
+        String tokenPrefix = token.substring(0, 7);
+        if(!"Bearer ".equals(tokenPrefix)){
+            filterChain.doFilter(request, response);
+            return;
+        }
         try {
+            token = token.substring(7);
             String userName = JwtTokenUtil.getUserNameFromToken(token);
             String[] authorities = JwtTokenUtil.getUserRoleFromToken(token).split(",");
             List<SimpleGrantedAuthority> list = new ArrayList<>();

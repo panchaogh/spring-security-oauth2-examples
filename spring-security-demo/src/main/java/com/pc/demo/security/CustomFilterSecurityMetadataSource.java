@@ -1,6 +1,11 @@
 package com.pc.demo.security;
 
-import com.pc.demo.dao.UserDao;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.pc.demo.model.entity.Permission;
+import com.pc.demo.model.entity.RolePermission;
+import com.pc.demo.service.PermissionService;
+import com.pc.demo.service.RolePermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
@@ -12,9 +17,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CustomFilterSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
-    @Autowired
-    private UserDao userDao;
     private final Map<String, Collection<ConfigAttribute>> temp = new HashMap<>();
+    @Autowired
+    private PermissionService permissionService;
+    @Autowired
+    private RolePermissionService rolePermissionService;
 
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
@@ -41,10 +48,14 @@ public class CustomFilterSecurityMetadataSource implements FilterInvocationSecur
      */
     private Collection<ConfigAttribute> getMatcherConfigAttribute(String url) {
         if (temp.isEmpty()) {
-            List<Map<String, Object>> list = userDao.findPermissionRole();
-            Map<String, List<Map<String, Object>>> urlRoles = list.stream().collect(Collectors.groupingBy(map -> (String) map.get("url")));
-            for (Map.Entry<String, List<Map<String, Object>>> entry : urlRoles.entrySet()) {
-                temp.put(entry.getKey(), entry.getValue().stream().map(map -> new SecurityConfig((String) map.get("roleId"))).collect(Collectors.toList()));
+            List<Permission> permissions = permissionService.list();
+            List<Long> permissionIds = permissions.stream().map(Permission::getId).collect(Collectors.toList());
+            LambdaQueryWrapper<RolePermission> rolePermissionLambdaQueryWrapper = Wrappers.<RolePermission>lambdaQuery().in(RolePermission::getPermissionId, permissionIds);
+            List<RolePermission> rolePermissions = rolePermissionService.list(rolePermissionLambdaQueryWrapper);
+            Map<Long, List<RolePermission>> rolePermissionMap = rolePermissions.stream().collect(Collectors.groupingBy(RolePermission::getPermissionId));
+
+            for (Permission permission : permissions) {
+                temp.put(permission.getUrl(), rolePermissionMap.get(permission.getId()).stream().map(rolePermission -> new SecurityConfig("ROLE_" + rolePermission.getRoleId())).collect(Collectors.toList()));
             }
         }
         Collection<ConfigAttribute> configAttributes = temp.get(url);
@@ -64,7 +75,7 @@ public class CustomFilterSecurityMetadataSource implements FilterInvocationSecur
      * @return 定义允许请求的列表
      */
     private List<String> allowedRequest() {
-        return Arrays.asList("/login", "/error","/css/**", "/fonts/**", "/js/**", "/scss/**", "/img/**");
+        return Arrays.asList("/login", "/error", "/css/**", "/fonts/**", "/js/**", "/scss/**", "/img/**");
     }
 
     /**
